@@ -15,9 +15,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Web</RootNamespace>
     <AssemblyName>Web</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -26,6 +26,8 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <ApplicationInsightsResourceId>/subscriptions/2d4dc7b2-21d7-4398-9fa5-238684687c92/resourcegroups/Default-ApplicationInsights-EastUS/providers/microsoft.insights/components/Web</ApplicationInsightsResourceId>
+    <Use64BitIISExpress />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -80,13 +82,13 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
@@ -140,6 +142,7 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
@@ -149,7 +152,12 @@
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\DataLayer\DataLayer.csproj">
+      <Project>{b6ef1b47-5dad-4cfd-8edc-1d413dfb5dff}</Project>
+      <Name>DataLayer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -160,9 +168,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Infrastructure\Database.cs" />
     <Compile Include="Infrastructure\OrderService.cs" />
-    <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\OrderProductVM.cs" />
+    <Compile Include="Models\OrderVM.cs" />
+    <Compile Include="Models\ProductVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -170,19 +179,32 @@
     <Content Include="App_Data\BrainWare_log.ldf">
       <DependentUpon>BrainWare.mdf</DependentUpon>
     </Content>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\JSLibraries\bootstrap.js" />
+    <Content Include="Content\JSLibraries\bootstrap.min.js" />
+    <None Include="Content\JSLibraries\jquery-1.10.2.intellisense.js" />
+    <Content Include="Content\JSLibraries\jquery-1.10.2.js" />
+    <Content Include="Content\JSLibraries\jquery-1.10.2.min.js" />
+    <Content Include="Content\JSLibraries\modernizr-2.6.2.js" />
+    <Content Include="Content\JSLibraries\respond.js" />
+    <Content Include="Content\JSLibraries\respond.min.js" />
+    <Content Include="Content\JSLibraries\toastr.js" />
+    <Content Include="Content\JSLibraries\toastr.min.js" />
+    <Content Include="Content\Scripts\OrderScripts.js" />
+    <Content Include="Content\Styles\bootstrap.css" />
+    <Content Include="Content\Styles\bootstrap.min.css" />
+    <Content Include="Content\Styles\Site.css" />
+    <Content Include="Content\Styles\toastr.css" />
+    <Content Include="Content\Styles\toastr.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="Scripts\jquery-1.10.2.js" />
-    <Content Include="Scripts\jquery-1.10.2.min.js" />
-    <Content Include="Scripts\modernizr-2.6.2.js" />
-    <Content Include="Scripts\respond.js" />
-    <Content Include="Scripts\respond.min.js" />
+    <Content Include="Content\JSLibraries\jquery-1.10.2.min.map" />
+    <Content Include="Content\toastr.less" />
+    <Content Include="Content\toastr.scss" />
+    <Content Include="scripts\toastr.js" />
+    <Content Include="scripts\toastr.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -190,7 +212,6 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Content\Site.css" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
@@ -204,7 +225,6 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
-    <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -224,7 +244,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>54730</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:54730/</IISUrl>
+          <IISUrl>http://localhost/Web</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

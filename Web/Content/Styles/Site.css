@@ -1,0 +1,34 @@
+﻿/*preference would be to go with a CSS preprocessor like LESS or SASS/SCSS instead of CSS*/
+
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+div.panel > .panel-heading {
+    background-color: rgba(83, 164, 164, 0.50);
+    font-weight: 800;
+}
+
+.list-group-item:last-child {
+    background-color: rgba(163, 219, 219, 0.50);
+    font-weight: 600;
+}

@@ -1,44 +1,42 @@
-﻿<div class="jumbotron">
-    <h1>BrainWare Orders</h1>
-    <p class="lead">This is the BrainWare orders page! Welcome</p>
+﻿<!--placeholder menu - options are not yet wired to existing pages-->
+<div>
+    <ul class="nav nav-pills">
+        <li role="presentation"><a href="#">Company Dashboard</a></li>
+        <li role="presentation" class="active"><a href="#">Orders</a></li>
+        <li role="presentation"><a href="#">Products</a></li>
+    </ul>
 </div>
+<div class="page-header">
+    <h1><span id="orderHeader">Orders</span> <small id="header-subtext">Display orders for BrainWare</small></h1>
+</div>
+
+<!-- inputs/buttons area to get orders and clear out orders-->
+<div class="row">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-btn">
+                <button id="orderIDInputBtn"class="btn btn-default" type="button">Search</button>
+            </span>
+            <input id="orderIDInput" type="text" class="form-control" placeholder="Get order by ID..."/>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="btn-group" role="group" aria-label="...">
+            <button id="getAllOrders" name="getOrders" type="button" class="btn btn-default">Show All Orders</button>
+            <button id="clearOrders" type="button" class="btn btn-default">Clear Orders</button>
+        </div>
+    </div>
+</div>
+
+<!--display area for orders: has title and div for inserting orders-->
 <div class="row">
     <div class="col-md-12">
-        <h2>Your Orders</h2>
+        <h2 id="orderTitle" class="hide">Orders:</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
         <div id="orders"></div>
     </div>
-  
 </div>
-<script>
-    $(document).ready(function () {
-        var $orders = $('#orders');
-        $.ajax({
-            'url': '/api/order/1',
-            'type': 'GET',
-            'success': function (data) {
-
-                var $orderList = $('<ul/>');
-
-                if (data) {
-                    $.each(data,
-                        function(i) {
-                            var $li = $('<li/>').text(this.Description + ' (Total: $' + this.OrderTotal + ')')
-                                .appendTo($orderList);
-
-                            var $productList = $('<ul/>');
-
-                            $.each(this.OrderProducts, function(j) {
-                                var $li2 = $('<li/>').text(this.Product.Name + ' ('+ this.Quantity +' @@ $' + this.Price + '/ea)')
-                                    .appendTo($productList);
-                            });
-
-                            $productList.appendTo($li);
-                        });
-
-                    $orders.append($orderList);
-                }
-            }
-        });
-    });
-</script>
-

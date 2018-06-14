@@ -1,24 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Web.Http;
+using Web.Infrastructure;
+using Web.Models;
 
 namespace Web.Controllers
 {
-    using System.Web.Mvc;
-    using Infrastructure;
-    using Models;
-
+    [RoutePrefix("api/order")]
     public class OrderController : ApiController
     {
+        //will be called if no id is supplied
         [HttpGet]
-        public IEnumerable<Order> GetOrders(int id = 1)
+        public List<OrderVM> GetAllOrders()
         {
-            var data = new OrderService();
+            var orderService = new OrderService();
+            return orderService.GetOrders();
+        }
 
-            return data.GetOrdersForCompany(id);
+        //will be called if ID and Action is specified
+        [HttpGet]
+        [Route("GetOrderById/{orderId}")]
+        public List<OrderVM> GetOrderById(int orderId)
+        {
+            var orderService = new OrderService();
+            return orderService.GetOrders(orderId);
         }
     }
 }

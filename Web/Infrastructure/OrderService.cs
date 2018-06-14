@@ -1,85 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DataLayer.DataContracts;
+using DataLayer.Repositories;
+using Web.Models;
 using System.Linq;
-using System.Web;
 
 namespace Web.Infrastructure
 {
-    using System.Data;
-    using Models;
-
     public class OrderService
     {
-        public List<Order> GetOrdersForCompany(int CompanyId)
+        /// <summary>
+        /// GetOrders - takes an optional Order Id and gets associated order or all orders
+        /// </summary>
+        /// <param name="OrderId"></param>
+        /// <returns>List of OrderVMs for display</returns>
+        public List<OrderVM> GetOrders(int? OrderId = null)
         {
+            var orderList = new List<Order>();
 
-            var database = new Database();
-
-            // Get the orders
-            var sql1 =
-                "SELECT c.name, o.description, o.order_id FROM company c INNER JOIN [order] o on c.company_id=o.company_id";
-
-            var reader1 = database.ExecuteReader(sql1);
-
-            var values = new List<Order>();
-            
-            while (reader1.Read())
+            if(OrderId == null)
             {
-                var record1 = (IDataRecord) reader1;
-
-                values.Add(new Order()
-                {
-                    CompanyName = record1.GetString(0),
-                    Description = record1.GetString(1),
-                    OrderId = record1.GetInt32(2),
-                    OrderProducts = new List<OrderProduct>()
-                });
-
+                orderList = new OrderRepository().GetAllOrders().ToList();
+            }
+            else
+            {
+                orderList = new OrderRepository().GetOrderById(OrderId.Value).ToList();
             }
 
-            reader1.Close();
+            var orderVMList = new List<OrderVM>();
 
-            //Get the order products
-            var sql2 =
-                "SELECT op.price, op.order_id, op.product_id, op.quantity, p.name, p.price FROM orderproduct op INNER JOIN product p on op.product_id=p.product_id";
-
-            var reader2 = database.ExecuteReader(sql2);
-
-            var values2 = new List<OrderProduct>();
-
-            while (reader2.Read())
+            foreach (var order in orderList)
             {
-                var record2 = (IDataRecord)reader2;
-
-                values2.Add(new OrderProduct()
+                if (orderVMList.Any() && orderVMList.Any(o => o.OrderId == order.OrderId))
                 {
-                    OrderId = record2.GetInt32(1),
-                    ProductId = record2.GetInt32(2),
-                    Price = record2.GetDecimal(0),
-                    Quantity = record2.GetInt32(3),
-                    Product = new Product()
-                    {
-                        Name = record2.GetString(4),
-                        Price = record2.GetDecimal(5)
-                    }
-                });
-             }
-
-            reader2.Close();
-
-            foreach (var order in values)
-            {
-                foreach (var orderproduct in values2)
-                {
-                    if (orderproduct.OrderId != order.OrderId)
-                        continue;
-
-                    order.OrderProducts.Add(orderproduct);
-                    order.OrderTotal = order.OrderTotal + (orderproduct.Price * orderproduct.Quantity);
+                    continue;
                 }
+                var orderProductList = CreateOrderProductVMList(order.OrderId, orderList);
+                orderVMList.Add(new OrderVM()
+                {
+                    OrderId = order.OrderId,
+                    CompanyName = order.Company.Name.Trim(),
+                    Description = order.Description,
+                    OrderProducts = orderProductList,
+                    OrderTotal = CalcOrderTotal(orderProductList)
+                });
             }
 
-            return values;
+            return orderVMList;
         }
+
+        //helper method to create the nested OrderProducts
+        private List<OrderProductVM> CreateOrderProductVMList(int orderId, List<Order> orderList)
+        {
+            if (orderList == null || !orderList.Any())
+            {
+                return new List<OrderProductVM>();
+            }
+            return orderList.Select(o => o.OrderProduct)
+                            .Where(op => op.OrderId == orderId)
+                            .Select(op => new OrderProductVM()
+                            {
+                                ProductId = op.ProductId,
+                                OrderPrice = op.OrderPrice,
+                                ProductName = op.Product.Name,
+                                Quantity = op.Quantity
+                            }).ToList();
+        }
+
+        //helper method to calculate the total of the order
+        private decimal CalcOrderTotal(List<OrderProductVM> orderProductList)
+        {
+            if (orderProductList == null || !orderProductList.Any())
+            {
+                return new decimal(0);
+            }
+            return orderProductList.Select(p => p.OrderPrice * p.Quantity).Sum();
+        }       
     }
 }
